@@ -68,6 +68,7 @@ router.get('/', (req, res, next) => {
             res.json(videogamesFilteredApi)
         })
         .catch((error) => {
+            res.status(404).json([{error: true, msj:`Sorry, Not Found`, status: 404}])
             next(error);
         })
     }
