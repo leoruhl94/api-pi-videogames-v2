@@ -16,8 +16,7 @@ router.get('/', (req, res, next) => {
     let findGamesDb = Videogames.findAll({ include: Genres, where:{ name: {
         [Op.iLike]: "%" + name + "%"
     }}});
-
-   
+    
     if(name){
         Promise.all([searchedApi, findGamesDb])
         .then((response) => {
