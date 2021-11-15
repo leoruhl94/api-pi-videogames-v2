@@ -24,7 +24,7 @@ const options = {
   }
 }
 
-app.use(cors(options));
+server.use(cors(options));
 
 
 server.use(express.urlencoded({ extended: true, limit: '50mb' }));
