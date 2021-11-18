@@ -1,18 +1,16 @@
 const { Router } = require("express");
 const router = Router();
-const { Platforms } = require("../db");
+const PlatformsService = require("../services/platformsService");
+
+const platformsService = new PlatformsService();
 
 router.get("/", async (req, res, next) => {
-  Platforms.findAll()
-    .then((allPlatforms) => {
-      let allPlatformsOrdered = allPlatforms.sort((a, b) => {
-        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-      });
-      res.status(200).json(allPlatformsOrdered);
-    })
-    .catch((err) => {
-      next(err);
-    });
+  try {
+    let platforms = await platformsService.find();
+    res.status(200).json(platforms);
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;
