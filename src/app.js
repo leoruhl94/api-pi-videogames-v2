@@ -1,22 +1,22 @@
+require("dotenv").config();
+const boom = require("@hapi/boom");
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
-const routes = require('./routes/index.js');
-const cors = require('cors');
+const axios = require("axios");
+// const cookieParser = require('cookie-parser');
+const routes = require('./routes/index');
+const cors = require('cors')
+const { logErrors, errorHandler, boomErrorHandler, ormErrorHandler } = require('./middlewares/errorHandler')
 
-require('./db.js');
+const app = express();
 
-const server = express();
-
-server.name = 'API';
-
-
+app.name = 'API';
 
 
 const whitelist = ['http://localhost:3000', 'https://the-games.herokuapp.com']
 const options = {
   origin: (origin, callback) => {
-    if (whitelist.includes(origin)) {
+    if (whitelist.includes(origin) || !origin) {
       callback(null, true);
     } else {
       callback(new Error('no permitido'));
@@ -24,29 +24,47 @@ const options = {
   }
 }
 
-server.use(cors(options));
+app.use(cors(options));
+ 
+
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(morgan('dev'));
+// app.use(cookieParser());
+
+app.get('/', (req, res, next)=>{
+  res.send('Hola parece que funciona')
+})
+app.get('/genres', async (req, res, next)=>{
+  try {
+    
+    let genresApi = await axios.get(
+      `https://api.rawg.io/api/genres?key=${process.env.API_KEY}`
+    );
+    res.json(genresApi.data.results)
+  } catch (error) {
+    next(error)
+  }
+})
+app.get('/platforms', async (req, res, next)=>{
+  try {
+    let platformsApi = await axios.get(
+      `https://api.rawg.io/api/platforms?key=${process.env.API_KEY}`
+    );
+    // console.log(platformsApi)
+    res.json(platformsApi.data.results)
+    
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.use('/api', routes);
+// // Error handler*/
+app.use(logErrors)
+app.use(ormErrorHandler)
+app.use(boomErrorHandler)
+app.use(errorHandler)
 
 
-server.use(express.urlencoded({ extended: true, limit: '50mb' }));
-server.use(express.json({ limit: '50mb' }));
-server.use(cookieParser());
-server.use(morgan('dev'));
-// server.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // update to match the domain you will make the request from
-//   res.header('Access-Control-Allow-Credentials', 'true');
-//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-//   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-//   next();
-// });
-
-server.use('/api', routes);
-
-// Error catching endware.
-server.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
-  const status = err.status || 500;
-  const message = err.message || err;
-  console.error(err);
-  res.status(status).send(message);
-});
-
-module.exports = server;
+module.exports = app;

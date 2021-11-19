@@ -7,10 +7,10 @@ const platforms = require('./platforms');
 
 const router = Router();
  
+router.use('/platforms', platforms);
 router.use('/genres', genres);
 router.use('/videogame', videogame);
 router.use('/videogames', videogames);
-router.use('/platforms', platforms);
 
 
 module.exports = router;

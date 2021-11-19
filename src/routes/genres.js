@@ -1,20 +1,16 @@
 const { Router } = require("express");
 const router = Router();
-const { Genres } = require("../db");
+const GenresService = require("../services/genresService");
+
+const genresService = new GenresService();
 
 router.get("/", async (req, res, next) => {
-  const { genre } = req.body;
-
-  Genres.findAll()
-    .then((allGenres) => {
-      let allGenresOrdered = allGenres.sort((a, b) => {
-        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-      });
-      res.status(200).json(allGenresOrdered);
-    })
-    .catch((err) => {
-      next(err);
-    });
+  try {
+    let genres = await genresService.find();
+    res.status(200).json(genres);
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;
