@@ -20,6 +20,10 @@ const whitelist = [
   "https://the-games.herokuapp.com",
   "http://the-games.herokuapp.com",
   "http://192.168.0.114:3000/",
+  "http://the-games-app.tk/",
+  "https://the-games-app.tk/",
+  "https://www.the-games-app.tk/",
+  "http://www.the-games-app.tk/"
 ];
 const options = {
   origin: (origin, callback) => {
