@@ -43,6 +43,10 @@ app.use(morgan("dev"));
 // app.use(cookieParser());
 
 app.use("/api", routes);
+app.get("/interval", async (req, res, next) => {
+    res.status(200).send("ok");
+});
+
 // // Error handler*/
 app.use(logErrors);
 app.use(ormErrorHandler);
